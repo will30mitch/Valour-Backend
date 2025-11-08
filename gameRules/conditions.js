@@ -8,3 +8,5 @@ function lose(playerState)
 
     else return false;
 }
+
+module.exports = { lose };

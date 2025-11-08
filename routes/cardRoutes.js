@@ -1,5 +1,5 @@
 const express = require('express');
-const Card = require('../models/Card');
+const Card = require('../models/Cards');
 const router = express.Router();
 
 // Get all cards
