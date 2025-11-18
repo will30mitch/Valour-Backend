@@ -1,45 +1,54 @@
 const GameSession = require('../models/GameSession');
 const Card = require('../models/Cards');
+const Deck = require('../models/Deck');
 const mongoose = require('mongoose');
 
-async function drawPhase(gameId, playerId) {
+
+async function drawPhase(gameId, playerId, deckId) {
   try {
     const game = await GameSession.findById(gameId);
     if (!game) {
       throw new Error('Game session not found');
     }
 
-    // Initialize state if needed
     game.state = game.state || {};
     game.state.playerStates = game.state.playerStates || {};
-    
+
     const playerState = game.state.playerStates[playerId];
     if (!playerState) {
       throw new Error('Player not found in game');
     }
 
-    // Get random card from database
-    const cardCount = await Card.countDocuments();
-    if (cardCount === 0) {
-      throw new Error('No cards in database');
+    // 🔹 Use the deckID passed from GraphQL
+    const deck = await Deck.findById(deckId);
+    if (!deck) throw new Error('Deck not found.');
+    if (!deck.cards || deck.cards.length === 0) {
+      throw new Error('Deck has no cards.');
     }
 
-    const random = Math.floor(Math.random() * cardCount);
-    const drawnCard = await Card.findOne().skip(random);
+    // Pick a random card ID from the deck.cards array
+    const randomIndex = Math.floor(Math.random() * deck.cards.length);
+    const drawnCardId = deck.cards[randomIndex];
 
-    // Initialize arrays if needed
+    // Fetch that Card document
+    const drawnCard = await Card.findById(drawnCardId);
+    if (!drawnCard) throw new Error('Card not found in DB.');
+
+    // Push to player's hand
     playerState.hand = playerState.hand || [];
     playerState.hand.push(drawnCard._id.toString());
 
-    // Update phase
+    // Advance phase
     game.state.phase = 'main';
     await game.save();
 
+    // 👉 Return the card itself and game state
     return {
-      drawnCardId: drawnCard._id.toString(),
+      drawnCard,                        // full Card doc
       nextPhase: game.state.phase,
       game
     };
+
   } catch (error) {
     console.error('Draw phase error:', error);
     throw error;

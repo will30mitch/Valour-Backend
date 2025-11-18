@@ -1,7 +1,9 @@
 const { drawPhase } = require('../phases/drawPhase');
-const GameSession = require('../models/GameSession');
 const User = require('../models/User');
+const GameSession = require('../models/GameSession');
 const Card = require('../models/Cards');
+const Deck = require('../models/Deck');
+const Hand = require('../models/Hand');
 
 module.exports = {
   Query: {
@@ -27,7 +29,16 @@ module.exports = {
       } catch (error) {
         throw new Error(`Failed to fetch game: ${error.message}`);
       }
-    }
+    },
+    cards: async (_, { id }) => {
+      try {
+        const card = await Card.findById(id);
+        if (!card) throw new Error('Card not found');
+        return card;
+      } catch (error) {
+        throw new Error(`Failed to fetch card: ${error.message}`);
+      }
+    },
   },
   
   Mutation: {
@@ -80,32 +91,63 @@ module.exports = {
       }
     },
 
-    drawCard: async (_, { gameId, playerId }) => {
+    createDeck: async (_, { userId, name, cardIds }) => {
       try {
-        const result = await drawPhase(gameId, playerId);
-        const drawnCard = await Card.findById(result.drawnCardId);
-        
-        if (!drawnCard) {
-          throw new Error('Drawn card not found in database');
+        const user = await User.findById(userId);
+        if (!user) {
+          throw new Error('User not found');
         }
+        const deck = new Deck({
+          user: userId,
+          name,
+          cards: cardIds
+        });
+        await deck.save();
+        return deck;
+      } catch (error) {
+        throw new Error(`Failed to create deck: ${error.message}`);
+      }               
+    },
 
+  drawCard: async (_, { gameId, playerId, deckID }) => {
+  try {
+    // Call drawPhase with deckID
+    const { drawnCard, nextPhase, game } = await drawPhase(gameId, playerId, deckID);
+
+    return {
+      drawnCard: [drawnCard._id.toString()],       // matches DrawResult.drawnCard: [ID]
+      message: `Drew ${drawnCard.name}`,
+      nextPhase,
+      gameState: {
+        phase: game.state.phase,
+        playerStates: game.state.playerStates,
+      },
+    };
+  } catch (error) {
+    // You *can* throw instead if you don't want drawnCard: null on errors
+    return {
+      drawnCard: null,
+      message: error.message,
+      nextPhase: null,
+      gameState: null,
+    };
+  }
+},
+
+
+    PlayerDeck: async (_, { deckId }) => {
+     try {
+        const deck = await Deck.findById(deckId);
+        if (!deck) {
+          throw new Error('Deck not found');
+        }
         return {
-          drawnCard: drawnCard.name,
-          message: `Drew ${drawnCard.name}`,
-          nextPhase: result.nextPhase,
-          gameState: {
-            phase: result.game.state.phase,
-            playerStates: result.game.state.playerStates
-          }
+          deck: deck.cards,
+          message: 'Deck retrieved successfully'
         };
       } catch (error) {
-        return {
-          drawnCard: null,
-          message: error.message,
-          nextPhase: null,
-          gameState: null
-        };
-      }
+        throw new Error(`Failed to retrieve deck: ${error.message}`);
     }
+  }
   }
 };

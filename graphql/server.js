@@ -7,6 +7,8 @@ const resolvers = require('./resolver');
 const Cards = require('../models/Cards');
 const GameSession = require('../models/GameSession');
 const User = require('../models/User');
+const Deck = require('../models/Deck');
+const Hand = require('../models/Hand');
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/valour-tcg';
 const PORT = process.env.PORT || 4000;
@@ -26,7 +28,9 @@ async function start() {
         models: {
           Cards,
           GameSession,
-          User
+          User,
+          Deck,
+          Hand
         }
       }),
       introspection: true
