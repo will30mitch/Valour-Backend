@@ -1,20 +1,38 @@
 {
+  "name": "valour-backend",
+  "version": "1.0.0",
+  "description": "Trading Card Game Backend",
+  "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js",
-    "test": "echo \"No tests specified\" && exit 0"
+    "start:graphql": "node graphql/server.js",
+    "dev": "nodemon graphql/server.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@auth/mongodb-adapter": "^3.10.0",
-    "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.2",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "git": "^0.1.5",
-    "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.19.0",
-    "mongoose": "^8.18.1",
-    "next-auth": "^4.24.11",
-    "zod": "^4.1.5"
+    "apollo-server": "^3.12.1",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "graphql": "^16.8.1",
+    "mongoose": "^7.6.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "@types/jest": "^29.5.6",
+    "nodemon": "^3.0.1",
+    "supertest": "^6.3.3"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": ["**/*.test.js"],
+    "transform": {},
+    "moduleFileExtensions": ["js", "json"],
+    "collectCoverageFrom": [
+      "controllers/**/*.js",
+      "phases/**/*.js",
+      "gameRules/**/*.js"
+    ]
   }
 }
