@@ -1,4 +1,5 @@
 const { drawPhase } = require('../phases/drawPhase');
+const { combatPhase } = require('../phases/combatPhase');
 const User = require('../models/User');
 const GameSession = require('../models/GameSession');
 const Card = require('../models/Cards');
@@ -148,6 +149,29 @@ module.exports = {
       } catch (error) {
         throw new Error(`Failed to retrieve deck: ${error.message}`);
     }
+  },
+combatPhase: async (_, { gameId, playerId, action }) => {
+    try {
+      const { game, nextPhase, message } = await combatPhase(gameId, playerId, action);
+
+      return {
+        success: true,
+        message,
+        gameState: {
+          phase: game.state.phase,
+          playerStates: game.state.playerStates,
+        },
+        nextPhase,
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.message,
+        gameState: null,
+        nextPhase: null,
+      };
+    }
+
   }
-  }
+}
 };

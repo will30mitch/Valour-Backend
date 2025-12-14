@@ -9,13 +9,13 @@ module.exports = gql`
 
   type Card {
     _id: ID!
-    name: String!
-    level: Int!
-    atkPts: Int!
-    defPts: Int!
-    type: String!
-    effect: String
-    desc: String
+    Card_Names: String!
+    LVL: Int!
+    ATK_PTS: Int!
+    DEF_PTS: Int!
+    TYPE: String!
+    EFFECT: String
+    DESC: String
     }
 
     type Deck {
@@ -54,6 +54,18 @@ module.exports = gql`
     message: String!
 }
 
+input CombatActionInput {
+    attackerId: ID!
+    defenderId: ID       # null = direct attack
+    targetPlayerId: ID!
+  }
+
+  type CombatResult {
+    success: Boolean!
+    message: String!
+    gameState: GameState
+    nextPhase: String
+  }
 
   scalar JSON
 
@@ -72,5 +84,6 @@ module.exports = gql`
     drawCard(gameId: ID!, playerId: ID!, deckID: ID!): DrawResult
     PlayerHand(gameId: ID!, playerId: ID!, cardId: ID!): HandResult
     PlayerDeck(deckId: ID!): DeckResult
+    combatPhase(gameId: ID!,playerId: ID!,action: CombatActionInput!): CombatResult
   }
 `;
