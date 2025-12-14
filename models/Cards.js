@@ -1,16 +1,16 @@
+// models/Cards.js
 const mongoose = require('mongoose');
 
 const cardSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  level: { type: Number, required: true },
-  atkPts: { type: Number, required: true },
-  defPts: { type: Number, required: true },
-  type: { type: String, required: true },
-  effect: { type: String },
-  desc: { type: String },
+  Card_Names: { type: String, required: true },
+  LVL:       { type: Number, required: true },
+  ATK_PTS:   { type: Number, required: true },
+  DEF_PTS:   { type: Number, required: true },
+  TYPE:      { type: String, required: true },
+  EFFECT:    { type: String },
+  DESC:      { type: String },
+}, {
+  collection: 'cards', // makes sure it uses the "cards" collection
 });
 
-// This will automatically create a "cards" collection in MongoDB
-const Card = mongoose.model('Card', cardSchema);
-
-module.exports = Card;
+module.exports = mongoose.model('Card', cardSchema);

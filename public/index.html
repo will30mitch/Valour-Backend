@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>React Game App</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+
+    <!-- ✅ React and ReactDOM via CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- ✅ Your frontend script -->
+    <script type="module">
+      const Home = () => {
+        return React.createElement(
+          React.Fragment,
+          null,
+          React.createElement("div", { style: { fontSize: "2rem", textAlign: "center", marginTop: "40px" } }, "Welcome to the React Game App!")
+        );
+      };
+
+      const root = ReactDOM.createRoot(document.getElementById("root"));
+      root.render(React.createElement(Home));
+    </script>
+  </body>
+</html>
